@@ -1,0 +1,34 @@
+---
+title: "lec10_4"
+author: "Jiansong Xu"
+date: "February 21, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##4
+
+_Test for effect of field_
+perform a LR test on each variable
+For field: H0: beta_2 = 0, Ha:beta_2 != 0
+```{r}
+library(car)
+placekick <- read.csv("Placekick.csv")
+typeof(placekick$field)
+placekick <- transform(placekick, field = as.factor(field))
+mod.fit <- glm(good ~ distance + field, family = binomial(link = "logit"), data = placekick)
+Anova(mod.fit, test = "LR")
+```
+For the output we see the variable "field" is not significant for model fit. So we conclude there is no effect on probability of success due to type of field. 
+
+_At different distances_
+```{r}
+beta.hat <- coef(mod.fit)[-1]
+all.dist <- seq(from = 20, to = 60, by = 10)
+OR.field <- exp(beta.hat[1]*all.dist + beta.hat[2])
+round(cbind(all.dist, OR.field), digits=2)
+```
+The effect of field at different distances varies. At distance 20 the effect appears to be the strongest, then diminishes when distance gets larger and larger.

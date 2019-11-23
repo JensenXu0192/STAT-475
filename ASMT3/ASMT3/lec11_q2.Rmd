@@ -1,0 +1,50 @@
+---
+title: "lec11_q2"
+author: "Jiansong Xu"
+date: "February 27, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##  Ex2
+
+(a)
+```{r}
+tomato <- read.csv("TomatoVirus.csv")
+tomato <- transform(tomato, Infest = as.factor(Infest))
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+library(package=mcprofile) 
+K <- matrix(data=c(0, 0, 1, -1, 1, -1),  nrow=1, ncol=6, byrow=TRUE)
+linear.combo <- mcprofile(object=mod.fit.inter, CM=K)
+ci.log.OR <- confint(object=linear.combo, level=0.95, adjust="none")
+OR.labels=c("ControlC/N at Infest2")
+data.frame(OR.labels, OR = round(exp(ci.log.OR$estimate),3),
+           OR.CI = round(exp(ci.log.OR$confint),3))
+```
+The odds of being affected with chemical control is 0.264 times as high as with no control.
+We expect 95% of all similarily constructed [0.175, 0.393] intervals to contain the odds ratio of being affected of controlC to controlN.
+
+(b)
+
+First do a significance test built-in summary(), then calculate the actual ORs to see the difference more directly.
+
+H0: beta_6 = 0(interaction of Infest2 and ControlC has no effect in the model)
+
+Ha: beta_6 != 0
+```{r}
+summary(mod.fit.inter)
+```
+Infest2:ControlC is significant under alpha = 0.05, so we reject H0, thus we can conclude that the interaction between infest method and control method has an impact on the dependent variable. But this does not provide enough evidence to see whether the expanatory variable 'Infest' significantly contributes to the OR of chemical control vs no control.
+
+Now compute the ORs
+```{r}
+beta.hat <- mod.fit.inter$coefficients[-1]
+beta.hat
+C.N.Inf2.0 <- exp(beta.hat[2] - beta.hat[3]) ##OR comparing chemical to no control when Infest = 1, i.e. Infest2 = 0
+C.N.Inf2.1 <- exp(beta.hat[2] - beta.hat[3] + beta.hat[4] - beta.hat[5]) ##OR when Infest = 2
+data.frame(Infest = c(1, 2), OR = round(c(C.N.Inf2.0, C.N.Inf2.1), 3))
+```
+However as we directly compare the 2 ORs under different infest method, the 2 values are very close, so switching infest methods may not make a difference.

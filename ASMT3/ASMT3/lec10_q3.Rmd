@@ -1,0 +1,25 @@
+---
+title: "lec10_3"
+author: "Jiansong Xu"
+date: "February 21, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##3
+Do a model comparasion using LR test
+
+H0: the coefficient of quadratic term of Temp = 0;
+
+Ha: the coefficient of quadratic term of Temp != 0
+```{r, message=FALSE}
+library(car)
+challenger <- read.csv("Challenger.csv")
+fit.1 <- glm(O.ring/Number ~ Temp, weight = Number, family = binomial(link = "logit"),data = challenger)
+fit.2 <- glm(O.ring/Number ~ Temp + I(Temp^2), weights = Number, family = binomial(link = "logit"), data = challenger)
+anova(fit.2, fit.1, test = "LR")
+```
+Based on p-value > 0.05, we cannot reject H0. So we accept that the quadratic term of Temp is not needed in our model.

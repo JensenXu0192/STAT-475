@@ -1,0 +1,79 @@
+---
+title: "Lec20_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(mcprofile)
+library(dplyr)
+aba <- read.csv("Abalone.csv")
+head(aba)
+```
+
+
+#(a)
+```{r}
+# Find estimates and their CIs using mcprofile
+
+aba$Sexf <- factor(x=aba$Sex, labels=c("I", "M", "F"))
+fit <- glm(Rings ~ Sexf*log(Shell), family = poisson(link = "log"), data = aba)
+
+##Coefficeint matrix for shell weight 0.2
+k <- matrix(data = c(1, 0, 0, log(0.2), 0, 0,
+                         1, 1, 0, log(0.2), log(0.2), 0,
+                         1, 0, 1, log(0.2), 0, log(0.2),
+                         1, 0, 0, log(0.3), 0, 0,
+                         1, 1, 0, log(0.3), log(0.3), 0,
+                         1, 0, 1, log(0.3), 0, log(0.3),
+                         1, 0, 0, log(0.4), 0, 0,
+                         1, 1, 0, log(0.4), log(0.4), 0,
+                         1, 0, 1, log(0.4), 0, log(0.4)), nrow = 9, byrow = TRUE)
+```
+```{r}
+# Report K matrix
+k
+```
+```{r}
+##Estimates and corresponding CIs
+out <- exp(confint(mcprofile(fit, k)))
+out$estimate %>% unlist() -> t
+out$confint %>% unlist() -> tt
+op.aba <- data.frame(Rings = t, lower = tt[1:9], upper = tt[10:18])
+op.aba <- `rownames<-`(op.aba, c("Weight 0.2 Infant", "Weight 0.2 Male", "Weight 0.2 Female", "Weight 0.3 Infant", "Weight 0.3 Male", "Weight 0.3 Female", "Weight 0.4 Infant", "Weight 0.4 Male", "Weight 0.4 Female"))
+op.aba
+```
+
+```{r}
+# Draw graph
+sex.col <- ifelse(aba$Sex==0,y=53,n=
+                      ifelse(aba$Sex==1, y=71,n=203))
+
+
+plot(x = aba[(aba$Sex==0),"Shell"], y = aba[(aba$Sex==0),"Rings"], 
+     ylab = "Number of Rings", xlab = "Shell Weight", 
+     main="Abalone Data Poisson Regression Example",
+     col=colors()[sex.col], pch=aba$Sex+1)
+
+library(dplyr)
+minMax = range(aba$Shell)
+# "rep(x,)" repeats x according to "times=" or "each="
+# rep(x=c(1,5), times=2)  gives 1,5,1,5
+# rep(x=c(1,5), each=2)  gives 1,1,5,5
+# Code below creates 100 values between min(Shell) and max(Shell),
+#   once for each Sex=0, 1, or 2
+xVals = data.frame(Shell=rep(seq(minMax[1], minMax[2], len = 100), times=3), 
+                  Sex=rep(c(0,1,2), each=100))
+xVals$Sexf <-  factor(x=xVals$Sex, labels=c("I", "M", "F"))
+yVals = predict(fit, newdata = xVals, type="response")
+# Add lines to the previous plot for each sex
+lines(x=xVals[xVals$Sex==0, "Shell"], y=yVals[xVals$Sex==0], lwd=2, col=colors()[53], )
+lines(x=xVals[xVals$Sex==1, "Shell"], y=yVals[xVals$Sex==1], lwd=2, col=colors()[71], )
+lines(x=xVals[xVals$Sex==2, "Shell"], y=yVals[xVals$Sex==2], lwd=2, col=colors()[203], )
+legend(x=0.45, y=5, legend=c("I", "M", "F"), lwd=2, col=colors()[c(53, 71, 203)])
+```
+
+Figure above seems identical to the one in lecture notes.

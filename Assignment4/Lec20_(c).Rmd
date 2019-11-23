@@ -1,0 +1,47 @@
+---
+title: "Lec20_(c)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## (c)
+
+```{r}
+aba <- read.csv("Abalone.csv")
+aba$Sexf <- factor(x=aba$Sex, labels=c("I", "M", "F"))
+fit <- glm(Rings ~ Sexf*log(Shell), family = poisson(link = "log"), data = aba)
+K.m <- matrix(c(0, 1, 0, 0, log(0.2), 0,
+                 0, 0, 1, 0, 0, log(0.2),
+                 0, 1, -1, 0, log(0.2), -1*log(0.2),
+                 0, 1, 0, 0, log(0.3), 0,
+                 0, 0, 1, 0, 0, log(0.3),
+                 0, 1, -1, 0, log(0.3), -1*log(0.3)), nrow = 6, byrow = TRUE)
+library(mcprofile)
+library(dplyr)
+mc <- mcprofile(fit, K.m)
+exp.mc <- exp(confint(mc))
+exp.mc$estimate %>% unlist() -> l
+exp.mc$confint %>% unlist() -> ll
+Ratios <- data.frame('Ratio of Means' = l, lower = ll[1:6], upper = ll[7:12])
+Ratios <- `row.names<-`(Ratios, c("M:I at 0.2", "F:I at 0.2", "M:F at 0.2", "M:I at 0.3", "F:I at 0.3", "M:F at 0.3"))
+```
+```{r}
+# Coefficient matrix
+K.m
+```
+```{r}
+#Estimates and CIs
+Ratios
+```
+```{r}
+#Comparison with estiamtes from part (a) leave 2 decimal places
+w0.2 <- c(9.51, 10.06, 10.25)
+w0.3 <- c(10.74, 11.16, 11.31)
+w0.4 <- c(11.70, 12.02, 12.12)
+M <- data.frame(Manual = c(w0.2[2]/w0.2[1], w0.2[3]/w0.2[1], w0.2[2]/w0.2[3], w0.3[2]/w0.3[1], w0.3[3]/w0.3[1], w0.3[2]/w0.3[3]))
+cbind(M, Ratios)[1:2]
+```
+By comparing mcprofile and manual results, we can see the ratios are close enough to say mcprofile estimates matches manual reports, results imported from part (a) has been rounded before calculation hence small differences can be ignored.

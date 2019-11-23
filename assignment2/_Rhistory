@@ -1,0 +1,29 @@
+knitr::opts_chunk$set(echo = TRUE)
+BW <- read.csv(file="C:/Users/jenx0/Desktop/stat475/assignment2/placekick.BW.csv", header=TRUE)
+library(dplyr)
+BW <- mutate(BW, GameNum = as.factor(GameNum))
+cfit <- glm(Good ~ ., family = binomial(link = "logit"), data = BW)
+BW %>% filter(Grass == 1, Weather != "Inside") -> Nick
+BW %>% filter(Grass == 0, Weather == "Inside") -> Steve
+Nick.pred <- predict(cfit, Nick)
+Steve.pred <- predict(cfit, Steve)
+N <- exp(mean(Nick.pred))/(1+exp(mean(Nick.pred))) ##Nick's mean probability of success
+S <- exp(mean(Steve.pred))/(1+exp(mean(Steve.pred))) ##Steve's mean probability of success
+data.frame(N, S)
+knitr::opts_chunk$set(echo = TRUE)
+c.table <- array(data = c(57, 142, 200688, 201087), dim = c(2, 2), dimnames = list(Treatment = c("Vaccine", "Placebo"), Result = c("Polio", "Polio free")))
+c.table
+polio <- data.frame(Treatment = c("Vaccine", "Placebo"), Polio = c(57, 142), Polio.free = c(200688, 201087))
+polio
+levels(polio$Treatment)
+library(dplyr)
+polio <- mutate(polio, Total = c(57+200688, 142+201087), probability = Polio.free/Total)
+polio
+pfit <- glm(Polio.free/Total ~ Treatment, family = binomial(link = "logit"), weights = Total, data = polio)
+summary(pfit)
+#Comparing odds
+exp(pfit$coefficients[2])
+#CI
+beta.ci<-confint.default(object = pfit, parm = "TreatmentVaccine", level = 0.95)
+exp(beta.ci)  #Reverse order to make it look right
+prop.test(x=c(57, 142), n=c(200745, 201229), alternative="two.sided", correct=FALSE)

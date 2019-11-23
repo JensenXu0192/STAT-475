@@ -1,0 +1,107 @@
+---
+title: "Lec24_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+library(dplyr)
+library(binom)
+challenger <- read.csv("challenger.csv")
+```
+
+(a)
+```{r}
+## Aggregate data
+w <- aggregate(O.ring ~ Temp, FUN = sum, data = challenger)
+n <- aggregate(O.ring ~ Temp +Number, FUN = length, data = challenger) 
+
+#Each row has 6 obs, so multiply each length by 6 to get number of Trials.
+n %>% mutate(Trials = Number*O.ring) %>% select(-Number, -O.ring) -> n 
+
+# Output
+aggdat <- data.frame(O.ring = w$O.ring, Temp = w$Temp, Trials = n$Trials)
+aggdat %>% mutate(Proportion = round(O.ring/Trials, 2)) -> aggdat
+print(aggdat)
+```
+
+(b)
+```{r}
+fit <- glm(O.ring/Trials ~ Temp, weights = Trials, family = binomial(link = "logit"), data = aggdat)
+summary(fit) -> i
+
+## Deviance residuals
+(i$deviance.resid -> q)
+
+# Spot the rarely large residual
+q[which(q > 2)]
+```
+Most of the residuals float around 0, but there is 1 residual that is >2. 
+
+One out of 16 is somewhere around 5%, so I do not concern too much about this rare residual, but it still worths check out.
+
+
+(c)
+```{r}
+s.res <- rstandard(fit, type = "pearson")
+aggdat %>% mutate(Std.Peason = round(s.res, 2)) -> aggdat
+aggdat
+```
+At Temp=75 the standard Pearson residual is 3.18, notice this is the same observation that has large deviance residual.
+
+
+(d)
+```{r}
+## Modify data for plotting
+ #    We need linear predictors, Pearson residuals and       standerdized Pearson residuals
+pi.hat <- predict(fit, type = "response")
+lin.pred <- fit$linear.predictors
+p.res <- residuals(fit, type = "pearson")
+bin <- data.frame(aggdat, pi.hat, s.res, p.res, lin.pred)
+bin <- round(bin,2)
+```
+```{r}
+# Standardized Pearson residual vs X plot
+plot(x = bin$Temp, y = bin$s.res, xlab = "Tempurature", ylab = "Standardized Pearson residuals", main = "Standardized residuals vs. \n X")
+abline(h = c(3, 2, 0, -2, -3), lty = "dotted", col = "blue")
+smooth.stand <- loess(formula = s.res ~ Temp, weights = Trials, data = bin )
+order.dist <- order(bin$Temp)
+lines(x = bin$Temp[order.dist], y = predict(smooth.stand)[order.dist], lty = "solid", col = "red", lwd = 1)
+```
+```{r}
+# Standardized Pearson residual vs pi plot
+plot(x = bin$pi.hat, y = bin$s.res, xlab = "Estimated probability of success(O.ring Failure)", ylab = "Standardized Pearson residuals", main = "Standardized residuals vs. \n pi.hat")
+abline(h = c(3, 2, 0, -2, -3), lty = "dotted", col = "blue")
+smooth.stand <- loess(formula = s.res ~ pi.hat, data = bin, weights = Trials)
+order.pi.hat <- order(bin$pi.hat)
+lines(x = bin$pi.hat[order.pi.hat], y = predict(smooth.stand)[order.pi.hat], lty = "solid", col = "red", lwd = 1)
+```
+```{r}
+# Standardized Pearson residual vs linear predictor plot
+plot(x = bin$lin.pred, y = bin$s.res, xlab = "Linear predictor", ylab = "Standardized Pearson residuals", main = "Standardized residuals vs. \n Linear predictor")
+abline(h = c(3, 2, 0, -2, -3), lty = "dotted", col = "blue")
+smooth.stand <- loess(formula = s.res ~ lin.pred, data = bin, weights = Trials)
+order.lin.pred <- order(bin$lin.pred)
+lines(x = bin$lin.pred[order.lin.pred], y = predict(smooth.stand)[order.lin.pred], lty = "solid", col = "red", lwd = 1)
+```
+
+
+i.
+All 3 plots appears to have curvature, but the residuals mostly stay around 0. 
+
+ii.
+Variance seems not constant around low probabilities, when probability goes higher variance seems a little more constant.
+
+iii.
+There is one observation with residual greater than 3. I consider this happens due to discrete distribution of data, beacause this extreme point appears at an estimated probability near 0. When pi_hat is small the variance is also small, therefore a rare success will inflate the residual. 
+
+
+
+(e)
+
+Overall: the model fit seems OK.
+
+Due to the discreteness of data, we cannot get much information from the unconstant variance and unusual residual, but other than that, a lot of estimates seem to have slightly negative residual, so we may need to modify the model. 

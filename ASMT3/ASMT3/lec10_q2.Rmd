@@ -1,0 +1,24 @@
+---
+title: "Lec10_2"
+author: "Jiansong Xu"
+date: "February 21, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##2
+```{r}
+placekick <- read.csv("Placekick.csv")
+mod.fit1 <- glm(formula=good ~ distance + I(distance^2), 
+               family=binomial(link=logit), data=placekick)
+mod.fit2 <- glm(formula=good ~ distance, family=binomial(link=logit), data=placekick)
+
+curve(expr = predict(mod.fit1, newdata = data.frame(distance = x),type = "response"), col = "red", xlim = c(10, 70))
+curve(expr = predict(mod.fit2, newdata = data.frame(distance = x), type = "response"), col = "blue", xlim = c(10, 70), add = TRUE)
+```
+
+
+At distance within [25, 46) and greater than 46, the quadratic terms affects the model more. 

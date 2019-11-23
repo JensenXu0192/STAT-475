@@ -1,0 +1,34 @@
+---
+title: "Lec18_3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+(a)
+Poisson. Because the count of children has no upper limit.
+
+(b)
+Binomial. Because the variable "if the first child is male" has only 2 possible values which are yes or no(special cases exist in real life, but in general this is an yes or no qustion).
+
+(c)
+Poisson. Becasue the number of one picked up his/her phone within a time range can potentially take any values.
+
+(d)
+i.
+Poisson. Number of people is not restricted with 0 and 1.
+ii. 
+Binomial. One either got on the bus or not, so the variable only has 2 possible values.
+
+(e)
+Poisson. within a time period, the word can appear many times with no maximum amount.
+
+(f)
+Binomial. Professor either has at least one typo or no typo at all, therefore only 2 possible outcomes.
+
+(g)
+Poission. The number of sleeping students during a lecture may take any values, and this number is unlikely to be upper bounded by 1.

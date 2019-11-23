@@ -1,0 +1,32 @@
+---
+title: "Lec19_3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ex 18
+
+```{r}
+#Fit the model
+burn <- data.frame(year = c(12, 12, 32, 20, 20, 27, 23, 19, 23, 26, 21, 3, 8, 35, 2, 19, 8, 25, 33, 35),
+                   Salamanders = c(3, 4, 8, 6, 10, 5, 4, 7, 2, 8, 6, 0, 2, 6, 1, 5, 1, 5, 4, 10))
+fit <- glm(Salamanders ~ year, family = poisson(link = "log"), data=burn)
+summary(fit)
+```
+```{r}
+#Graph
+plot(x = burn$year, y = burn$Salamanders, xlab = "years after burn", ylab = "Saladander population")
+curve(expr = exp(fit$coefficients[1] + x*fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+```
+
+We can see poisson regression using a linear term of expanatory variable mostly fits well, however the left-tail seems to be slightly upward biased, but given there are less observations at the left side this bias might be a normal phenomenon; and the right side appears to have large variance, so there may exist some other effects that help explain population change.
+
+```{r}
+##Find the percentage change in Salamander population when year +1
+round(100*(exp(fit$coefficients[2]) - 1), 2)
+```
+One additional year after burn yields 4.55% increase in salamander population.
+

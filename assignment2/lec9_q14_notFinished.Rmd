@@ -1,0 +1,60 @@
+---
+title: "Lecture9_14"
+author: "Jiansong Xu"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 14
+
+(a)
+```{r}
+c.table <- array(data = c(57, 142, 200688, 201087), dim = c(2, 2), dimnames = list(Treatment = c("Vaccine", "Placebo"), Result = c("Polio", "Polio free")))
+c.table
+polio <- data.frame(Treatment = c("Vaccine", "Placebo"), Polio = c(57, 142), Polio.free = c(200688, 201087))
+polio
+```
+
+(b)
+```{r}
+levels(polio$Treatment)
+```
+
+(c)
+```{r}
+library(dplyr)
+polio <- mutate(polio, Total = c(57+200688, 142+201087), probability = Polio.free/Total)
+polio
+pfit <- glm(Polio.free/Total ~ Treatment, family = binomial(link = "logit"), weights = Total, data = polio)
+summary(pfit)
+```
+The explanatory variable "Treatment" indicates the type of treatment, TreatmentVaccine is the Vaccine treatment, Placebo treatment is the "baseline" in this model.
+
+(d)
+```{r}
+#Comparing odds
+exp(pfit$coefficients[2])
+#CI
+beta.ci<-confint.default(object = pfit, parm = "TreatmentVaccine", level = 0.95)
+exp(beta.ci)  #Reverse order to make it look right
+```
+
+The patients with vaccine has odds of being polio free 2.468 times as high as others with placebo. 
+The result is same as section 1.2.5.
+
+(e)
+Use score test to test:
+H0: Pi1 - Pi2 = 0
+Ha: Pi1 - Pi2 != 0
+```{r}
+prop.test(x=c(57, 142), n=c(200745, 201229), alternative="two.sided", correct=FALSE)
+
+```
+Based on test result, we reject H0, so there is a difference between 2 rates.
+
+(f)
+Because in logistic model, we can directly see the effect of each variable by looking at coefficients, and we can see the significance of each parameter by looking at summary() function output.  

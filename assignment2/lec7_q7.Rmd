@@ -1,0 +1,30 @@
+---
+title: "Lecture 7_7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 7
+
+(a)
+glm function automaticlly defines the one letter that appears more advancely in alphabet as 'failure'. So in this data, failure is N, success is Y.
+
+(b)
+```{r}
+BW <- read.csv('U:/stat475/assignment2/placekick.BW.csv')
+ft <- glm(Good ~ Distance, family = binomial(link = logit), data = BW) 
+curve(expr = predict(object = ft, newdata = data.frame(Distance = x), type = "response"), col = "red", xlim = c(18, 66))
+```
+
+(c)
+```{r}
+placekick <- read.csv('U:/stat475/assignment2/Placekick.csv')
+mod.fit <- glm(formula=good ~ distance, family=binomial(link = logit), data=placekick)
+curve(expr = predict(object = ft, newdata = data.frame(Distance = x), type = "response"), col = "red", xlim = c(18, 66))
+curve(expr = predict(object = mod.fit, newdata = data.frame(distance = x), type = "response"), col = "blue", add = TRUE, xlim = c(18, 66))
+```
+
+They are highly matched because the observations of distances and 'good' are not very different across data.

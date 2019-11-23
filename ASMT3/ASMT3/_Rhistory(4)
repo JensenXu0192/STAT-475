@@ -1,0 +1,47 @@
+knitr::opts_chunk$set(echo = TRUE)
+pearson <- function(counts){chisq.test(x=counts, p=c(9,3,3,1)/16, correct=FALSE)$statistic}
+samp.size <- 1611
+set.seed(123)
+rcount <- rmultinom(n=1000, size=samp.size, prob=c(9,3,3,1)/16)
+p.stats <- apply(X=rcount, MARGIN=2, FUN=pearson)
+summary(p.stats)
+hist(x=p.stats, breaks=c(0:50)/2, freq=FALSE, main="Histogram of Pearson Stats for Simulated Data")
+curve(expr=dchisq(x=x, df=3), add=TRUE, col="red")
+# Add line at the 0.05 critical value of chi-squared(3)
+abline(v=qchisq(0.95, df=3), col="blue")
+n <- 10
+probs <- c(9,3,3,1)/16
+n*probs -> counts10
+list10 <- as.list(counts10)
+names(list10) <- c("Tall cut-Leaf", "Tall potato-leaf", "Dwarf cut-leaf", "Dwarf potato-leaf")
+data.frame(list10)
+samp.size <- 10
+set.seed(123)
+rcount <- rmultinom(n=1000, size=samp.size, prob=c(9,3,3,1)/16)
+p.stats <- apply(X=rcount, MARGIN=2, FUN=pearson)
+hist(x=p.stats, breaks=c(0:50)/2, freq=FALSE, main="Histogram of Pearson Stats for Simulated Data")
+invisible(curve(expr=dchisq(x=x, df=3), add=TRUE, col="red"))
+# Add line at the 0.05 critical value of chi-squared(3)
+abline(v=qchisq(0.95, df=3), col="blue")
+##Make a function which draws graphs for later use
+probs <- c(9,3,3,1)/16
+draw <- function(ss) {
+n <- ss
+n*probs -> counts
+list <- as.list(counts)
+names(list) <- c("Tall cut-Leaf", "Tall potato-leaf", "Dwarf cut-leaf", "Dwarf potato-leaf")
+list
+rcount <- rmultinom(n=1000, size=ss, prob=probs)
+p.stats <- apply(X=rcount, MARGIN=2, FUN=pearson)
+hist(x=p.stats, breaks=c(0:65)/2, freq=FALSE, main=paste0("Histogram of Pearson Stats for Simulated Data"))
+curve(expr=dchisq(x=x, df=3), add=TRUE, col="red")
+abline(v=qchisq(0.95, df=3), col="blue")
+return(data.frame(list))
+}
+set.seed(123)
+draw(20)
+set.seed(123)
+draw(40)
+set.seed(123)
+draw(80)
+setwd("C:/Users/jxa36.ADSFU/Desktop/ASMT3")

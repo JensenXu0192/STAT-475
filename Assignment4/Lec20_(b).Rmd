@@ -1,0 +1,65 @@
+---
+title: "Lec20_(b)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## (b)
+
+```{r}
+aba <- read.csv("Abalone.csv")
+aba$Sexf <- factor(x=aba$Sex, labels=c("I", "M", "F"))
+fit <- glm(Rings ~ Sexf*log(Shell), family = poisson(link = "log"), data = aba)
+library(mcprofile)
+k.change <- matrix(c(0, 0, 0, log(1+0.1/0.1), 0, 0, 
+                       0, 0, 0, log(1+0.1/0.1), log(1+0.1/0.1), 0, 
+                       0, 0, 0, log(1+0.1/0.1), 0, log(1+0.1/0.1),
+                       0, 0, 0, log(1+0.1/0.2), 0, 0, 
+                       0 ,0 ,0, log(1+0.1/0.2), log(1+0.1/0.2), 0,
+                       0, 0, 0, log(1+0.1/0.2), 0, log(1+0.1/0.2),
+                       0, 0, 0, log(1+0.1/0.3), 0, 0, 
+                       0, 0, 0, log(1+0.1/0.3), log(1+0.1/0.3), 0,
+                       0, 0, 0, log(1+0.1/0.3), 0, log(1+0.1/0.3)), nrow = 9, byrow = TRUE) 
+
+# Ratio change
+rc <- exp(confint(mcprofile(fit, k.change)))
+
+
+#Convert to percentage change
+i_0.1 <- unlist(rc$estimate)
+ii_0.1 <- unlist(rc$confint)
+est_0.1 <- 100*(i_0.1-1)
+ci_0.1 <- 100*(ii_0.1-1)
+
+change.est <- data.frame('Percentage Change' = est_0.1, lower = ci_0.1[1:9], upper = ci_0.1[10:18])
+change.est <- `row.names<-`(change.est, c("Weight 0.1 Infant", "Weight 0.1 Male", "Weight 0.1 Female", "Weight 0.2 Infant", "Weight 0.2 Male", "Weight 0.2 Female", "Weight 0.3 Infant", "Weight 0.3 Male", "Weight 0.3 Female"))
+change.est
+```
+
+```{r}
+# Report coefficient matrix
+k.change
+```
+```{r}
+# Find the same thing manually from part (a)
+
+# Estiamtes from part (a) leave 2 decimal places
+w0.2 <- c(9.51, 10.06, 10.25)
+w0.3 <- c(10.74, 11.16, 11.31)
+w0.4 <- c(11.70, 12.02, 12.12)
+
+#Manually compute rate of change
+q <- (w0.3-w0.2)/w0.2 # 0.2 to 0.3
+w <- (w0.4-w0.3)/w0.3 # 0.3 to 0.4
+qq <- data.frame(manual = q)
+ww <- data.frame(manual = w)
+mn <- rbind(qq, ww)
+cop <- cbind(change.est$Percentage.Change[4:9], mn)
+cop <- `colnames<-`(cop, c("estimate", "manual"))
+cop <- `row.names<-`(cop, c("Infant 0.2", 'Male 0.2', 'Female 0.2', "Infant 0.3", 'Male 0.3', 'Female 0.3'))
+cop
+```
+By comparing mcprofile and manual results, the changes are almost identical, tiny difference is predictable because I rounded results from part(a) to the second decimal place before calculation. 

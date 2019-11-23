@@ -1,0 +1,36 @@
+---
+title: "Lec22_2(b)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# i
+
+Mutual Independence: S, C, H, P
+
+2-way Homogeneous: SC, SH, SP, CH, CP, HP
+
+3-way Homogeneous: SCH, SCP, SHP, CHP
+
+
+# ii
+
+15 parameters in total, including 4 independent effects, 6 2-way interactions, 4 3-way interactions, and 1 intercept.
+
+
+# iii
+
+Since we are interested in whether smoking and social class is related to either symptom's frequence and whether interactions exist, ideally using a model with up to 3-way interactions would give us enough parameters to see the effects of interest by hypothesis tests and odds ratios. Saturated model is not needed at this point, because there's nothing we are expecting to see lies only in the 4-way interaction, but if the analysis goes further we will need to fit the saturated model eventually.
+
+
+# iv
+
+SH, SP, CH, CP, SCH, SCP
+
+
+# v
+
+SHP, CHP

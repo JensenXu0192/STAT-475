@@ -1,0 +1,97 @@
+---
+title: "Lecture 6"
+author: "Jiansong Xu"
+date: "February 4, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 23
+
+(a)
+Pi+1 - Pi-1 means the difference between the joint probabilities of the second free throw being successful(given the first free throw successed or failed) and the first free throw being successful(given the second one successed or failed).
+(b)
+```{r}
+# Create contingency table - notice the data is entered by columns
+c.table<-array(data = c(251, 48, 34, 5), dim = c(2,2), dimnames = list(First = c("made", "missed"),
+             Second = c("made", "missed")))
+list(First = c("made", "missed"), Second = c("made", "missed"))  # See dimnames
+c.table  # Whole table
+c.table[1,1]  # w1
+c.table[1,]  # w1 and n1-w1
+sum(c.table[1,])  # n1
+rowSums(c.table)  # n1 and n2
+
+# Find the estimated pi^j
+pi.hat.table<-c.table/rowSums(c.table)
+pi.hat.table
+sum(pi.hat.table[1,])
+
+# Another way to create a contingency table
+c.table2<-array(data = c(251, 48, 34, 5), dim = c(2,2), dimnames = list(c("first made", "first missed"),
+             c("second made", "second missed")))
+c.table2
+```
+
+
+
+```{r}
+#Settings
+install.packages("PropCIs")
+library(PropCIs)
+alpha <- 0.05
+n.11 <- 251
+n.10 <- 34
+n.01 <- 48
+n.00 <- 5
+n <- n.11 + n.01 + n.10 + n.00
+pi.hat.10 <- n.10/n
+pi.hat.01 <- n.01/n
+pi.diff.hat <- pi.hat.01 - pi.hat.10
+```
+
+```{r}
+#Wald CI
+ pi.hat1<-pi.hat.table[1,1]
+  pi.hat2<-pi.hat.table[2,1]
+lower<-pi.hat1 - pi.hat2 - qnorm(p = 1-alpha/2) *
+    sqrt(pi.hat1*(1-pi.hat1) / sum(c.table[1,]) +
+    pi.hat2*(1-pi.hat2) / sum(c.table[2,]))
+  upper<-pi.hat1 - pi.hat2 + qnorm(p = 1-alpha/2) *
+    sqrt(pi.hat1*(1-pi.hat1) / sum(c.table[1,]) +
+    pi.hat2*(1-pi.hat2) / sum(c.table[2,]))
+  data.frame(lower, upper)
+
+  
+  
+```
+
+```{r}
+#Score CIs
+scoreci.mp(b=n.10, c=n.01, n=n, conf.level = 0.95)
+```
+
+(c)
+```{r}
+n.table <- matrix(data=c(n.11, n.10, n.01, n.00), nrow=2, byrow=TRUE)
+mcnemar.test(x=n.table, correct=FALSE)
+```
+
+We failed to reject null hypothesis using alpha = 0.05
+
+(d)
+CIs: We expect 95% of all similarly constructed intervals to contain the true difference between joint probabilities of success in 2 attempts.  
+
+Hypothesis test: We failed to reject H0:pi_+1 - p1_1+ = 0, so we cannot conclude Larry Bird is likely to make better throw in one of the 2 attempts.
+
+(e)
+Because normally we expect after warming up, the athelete will make better throw. So the second throw(the one with warm up effect) has greater rate of success.
+```{r}
+M <- (n.01 - n.10)^2/(n.10 + n.01)
+p.mc <- 1 - pchisq(M, 1)/2
+p.mc
+```
+We failed to reject H0. 

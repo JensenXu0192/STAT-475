@@ -1,0 +1,82 @@
+---
+title: "Lec25_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+library(dplyr)
+challenger <- read.csv("challenger.csv")
+```
+
+(a)
+```{r}
+## Fit a logistic regression model
+## Aggregate data
+w <- aggregate(O.ring ~ Temp, FUN = sum, data = challenger)
+n <- aggregate(O.ring ~ Temp +Number, FUN = length, data = challenger) 
+
+#Each row has 6 obs, so multiply each length by 6 to get number of Trials.
+n %>% mutate(Trials = Number*O.ring) %>% select(-Number, -O.ring) -> n 
+
+# Output data
+aggdat <- data.frame(O.ring = w$O.ring, Temp = w$Temp, Trials = n$Trials)
+aggdat %>% mutate(Proportion = round(O.ring/Trials, 2)) -> aggdat
+
+## Use summary() to examine residual deviance and df
+lfit <- glm(O.ring/Trials ~ Temp, weights = Trials, family = binomial(link = "logit"), data = aggdat)
+(lsum <- summary(lfit))
+rdev <- lfit$deviance 
+dfr <- lfit$df.residual 
+
+# Deviance/df statistic
+ddf <- rdev/dfr 
+thresh2 <- 1 + 2*sqrt(2/dfr) 
+thresh3 <- 1 + 3*sqrt(2/dfr) 
+round(c(rdev, dfr, ddf, thresh2, thresh3), digits=2)
+```
+```{r}
+## Graphic assessment of residuals
+s.res <- rstandard(lfit, type = "pearson")
+grp <- round(data.frame(aggdat, s.res), 2)
+plot(x=grp$Temp, y=grp$s.res, xlab = "Tempurature", ylab = "Standerdized Pearson residual", main = "Standerdized Pearson residuals vs. /n x")
+abline(h = c(3, 2, 0, -2, -3), lty = "dotted", col = "blue")
+```
+
+From the D/df we see the ratio isn't even close to the first threshold, base on this rough test the model fit seems good. Yet from the graph we see an extreme residual. 
+
+
+
+
+(b)
+```{r}
+## LR test
+c(rdev, dfr, pchisq(q=rdev, df=dfr, lower.tail=FALSE))
+```
+LR Goodness-of-fit test:
+
+
+H0: the model is a good fit;  Ha: model is not a good fit.
+
+p-value = 0.06
+
+We failed to reject H0, thus we do not have enough evidence to suggest that this model is a poor fit.
+
+
+
+```{r}
+## Examine expected counts
+pi.hat <- predict(lfit, type = "response") 
+p.res <- residuals(lfit, type = "pearson") 
+pear <- sum(p.res^2)
+aggdat$pi.hat <- pi.hat
+aggdat$p.res <- p.res
+aggdat$exp.succ <- aggdat$Trials * aggdat$pi.hat
+aggdat$exp.fail <- aggdat$Trials * (1 - aggdat$pi.hat)
+round(aggdat[,c("Temp", "Trials", "pi.hat", "exp.succ", "exp.fail")], digits=2) -> exps
+summary(exps[,4:5])
+```
+The expected success is really low that even the maximum is merely 1.56, so the LR is not valid in this case.

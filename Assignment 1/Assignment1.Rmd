@@ -1,0 +1,176 @@
+---
+title: "Assignment 1"
+author: "Jiansong Xu"
+date: "January 18, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(binom)
+library(dplyr)
+```
+#Lecture 3
+
+1. 
+
+a.
+1)	There are n identical trails. This is satisfied, since each observation was recorded at the same town, same intersection, within one-half an hour time range. 
+
+2)	There are 2 possible outcomes. This is satisfied, because the car is either alternative fuel using or not. 
+
+3)	Each trail is independent to others. This condition is satisfied, because the type of one car does not affect the type of next car being observed.  
+
+4)	The possibility of success remains constant through trails.  This condition holds, because this is not likely to be affected by excluded measures.
+
+5)	The random variable of interest W is number of success. Satisfied, in this experiment , W=14.
+
+b. 
+```{r}
+alpha <- 0.05
+w <- 14
+n <- 125
+pi.hat <- w/n
+var.pi.hat <- pi.hat*(1-pi.hat)/n
+pi.0 = 0.08
+```
+
+```{r}
+chop <- c("agresti-coull", "asymptotic", "wilson", "exact")
+binom.confint(x = w, n = n, conf.level = 1-alpha, methods = "all") %>% filter(method %in% chop) -> CI1
+CI1
+```
+
+c. 
+#Use 2-side Likelihood Ration test H0: pi = 0.08 Ha: pi != 0.08
+```{r}
+LR <- -2*(w*log(pi.0/pi.hat) + (n-w)*log((1-pi.0)/(1-pi.hat)))
+p.LR2 <- 1 - pchisq(LR, df=1) #2-side p value
+list(LR=LR, P = p.LR2)
+```
+
+We fail to reject H0, so we cannot conclude the probability in this intersection is differ from nationwide probability.
+
+2.
+```{r}
+alpha <- 0.05
+w2 <- 79
+n2 <- 80
+pi.hat2 <- w2/n2
+var.pi.hat2 <- pi.hat2*(1-pi.hat2)/n
+pi2.0 = 1
+```
+
+```{r}
+chop2 <- c("asymptotic", "wilson")
+binom.confint(x = w2, n = n2, conf.level = 1-alpha, methods = "all") %>% filter(method %in% chop2) -> CI2
+CI2
+```
+
+(a) Wald CI: [0.963 - 1.011]. We except 95% of similarly constructed intervals to contain the true probability of a random selected resident to oppose the tax.
+
+(b) Wilson CI: [0.033 - 0.998]. We expect 95% of similarly constructed intervals to contain the parameter pi which represents the true probability of a random selected resident to oppose the tax.
+
+(3) We can testify this by performing Score test. H0: pi = 1, Ha: pi < 1
+```{r}
+# Score Test Manual
+(Z0 = (pi.hat2 - pi2.0)/sqrt(0.5*0.5/n2))
+(p.score <- pnorm(Z0)) #lower tail p-value
+```
+Base on p value we fail to reject H0, so it is possible for pi = 1.
+
+(d)
+I prefer the Wilson CI, as it is constructed using the pi corresponding to the null hypothesis, and the sample size is rather small, so Wilson performs better.
+
+
+3.
+```{r}
+n3 = 1000 #large sample
+n3.1 = 10 #small sample
+```
+
+(a)
+```{r}
+binom.confint()
+```
+
+
+
+
+
+
+
+
+#Lecture 4
+
+1.
+```{r}
+library(PropCIs)
+alpha <- 0.05
+
+#No time-out group
+w.v <- 22
+n.v <- 26 
+#Time-out group
+w.p <- 10
+n.p <- 16 
+```
+
+(a)
+```{r}
+wald2ci(x1=w.v, n1=n.v, x2=w.p, n2=n.p, conf.level = 0.95, adjust = "Wald")
+```
+
+```{r}
+wald2ci(x1=w.v, n1=n.v, x2=w.p, n2=n.p, conf.level = 0.95, adjust = "AC")
+```
+
+```{r}
+diffscoreci(x1=w.v, n1=n.v, x2=w.p, n2=n.p, conf.level = 0.95)
+```
+For each type of interval: we expect 95% of all similarly constructed intervals to contain the true value of the difference between the probabilities of success of 2 strategy groups.
+
+(b)
+```{r}
+#score
+prop.test(x=c(w.v, w.p), n=c(n.v, n.p), alternative="less", correct=FALSE)
+```
+Based on large p value, we fail to reject H0: pi1 = pi2.
+```{r}
+#LR
+kicmat <- matrix(data=c(w.v, w.p, n.v-w.v, n.p-w.p), nrow=2)
+library(vcd)
+assocstats(kicmat)
+```
+We cannot reject H0 using LR test, as p value is greater than alpha = 0.05.
+
+2.
+```{r}
+#Non-native group
+w.v2 <- 118
+n.v2 <- 211
+
+#Native group
+w.p2 <- 155
+n.p2 <- 206
+```
+
+H0: pi1 - pi2 = 0  
+Ha: pi1 - pi1 < 1
+alpha = 0.05
+
+Use score test
+```{r}
+prop.test(x=c(w.v2, w.p2), n=c(n.v2, n.p2), alternative="less", correct=FALSE)
+```
+We reject H0 because p value is smaller than alpha.
+So we conclude that non-native English speaking students do not pick up on humor as much as native English speaking stduents.  
+
+
+
+
+
+

@@ -1,0 +1,61 @@
+---
+title: "lec15_1"
+author: "Jiansong Xu"
+date: "March 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1
+```{r}
+workers <- read.csv("healthcare_worker.csv")
+head(workers)
+levels(workers$Occup.group)
+```
+
+(a)
+```{r}
+library(tidyverse)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Number, Absence, Presence) -> workers
+xtabs(Number ~ Occup.group + status, data = workers) -> wrk.table
+wrk.table
+```
+
+(b)
+Let I,J denote Occup.group and status
+H0: Pi_ij = Pi_i+ + Pi_+j for each i,j
+Ha: Pi_ij != Pi_i+ + Pi_+j for some i,j
+```{r}
+library(package = vcd)
+assocstats(x = wrk.table)
+ind.test <- chisq.test(x=wrk.table, correct=FALSE)
+ind.test
+```
+We cannot reject H0. So we can conclude type of occupational group and status of hepatitis are independent.
+
+(c)
+```{r}
+prop.table(wrk.table, margin=1)
+round(ind.test$stdres, digits=1)
+```
+Workers who have no patient contacts tends to have higher conditional probability of carrying hepatitis, and those who have patient contact have the lowest conditional probability among all groups(This was not my expection).
+None of the residuals appear to be unusual(absolute value greater than 2 or 3), but 'No patient contact' group has relatively large residuals. 
+
+(d)
+H0: beta_1 = beta_2 = beta_3 = beta_4 = 0
+Ha: not all beta_s are 0
+```{r}
+wrk2 <- read.csv("healthcare_worker.csv")
+wrk2 <- mutate(wrk2, Occup.group = as.factor(Occup.group))
+lgfit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+library(car)  
+anova(lgfit, test = "LR")
+```
+We cannot reject H0. So we can conclude type of occupational group has no effect on probability of carrying hepatitis.
+
+(e)
+Because assuming 2 variables in a contingency table are independent is basiclly same as assuming one has 0 effect on another, putting this into logistic regression we should expect to see the one as explanatory variable is not signifacant in model fit.

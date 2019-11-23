@@ -1,0 +1,22 @@
+---
+title: "Lecture8_1"
+author: "Jiansong Xu"
+date: "February 5, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 1
+```{r}
+challenger <- read.csv('U:/stat475/assignment2/challenger.csv')
+mod.fit <- glm(formula=O.ring/Number ~ Temp, family=binomial(link = logit), weights = Number, data=challenger)
+beta.ci <- confint(object = mod.fit, parm = "Temp", level = 0.95)
+beta.ci##LR CI
+```
+
+```{r}
+round(confint.default(mod.fit), digits=3)##Wald CI
+```

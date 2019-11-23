@@ -1,0 +1,61 @@
+---
+title: "Lecture9_part2"
+author: "Jiansong Xu"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2
+
+
+```{r}
+placekick <- read.csv(file="U:/stat475/assignment2/Placekick.csv", header=TRUE)
+pred.d <- data.frame(distance = 76)
+fit <- glm(good ~ distance, family = binomial(link = "logit"), data = placekick)
+odds <- predict(fit, pred.d, type = "response")
+exp(odds)/(1+(exp(odds)))
+```
+
+(a)
+```{r}
+library(package = mcprofile)
+
+# Create the coefficient matrix for the parameters in the 
+#   linear predictor
+K <- as.matrix(cbind(1, pred.d))
+class(K)  # matrix
+head(K)
+
+# Use the mcprofile(object=, CM=, ...) function to find profile 
+#   likelihood values.
+# Can take a little time in complex models.
+profiles <- mcprofile(object=fit, CM=K)  
+
+# There is a confint() method developed specifically for objects 
+#   produced by mcprofile().  "adjust=" allows you to use methods 
+#   to control simultaneous coverage probabilities, like Bonferroni 
+ci.logit.LR <- confint(object=profiles, level=0.95, adjust = "none")  
+# CI for beta_0 + beta_1 * x
+
+ci.pi.LR <- exp(ci.logit.LR$confint)/(1 + exp(ci.logit.LR$confint))
+head(ci.pi.LR)
+
+```
+
+We expect 95% of all similarly constructed intervals to contain the probability of sucess when distance = 76 yards. 
+Based on predicted model, it is really unlikely to succeed.
+
+(b)
+```{r}
+# Estimated odds ratio
+# 12-yard decrease from 76 to 64
+exp(-12*fit$coefficients[2])
+beta.ci <- confint(object=fit, parm="distance", level=0.95)
+rev(exp(-12*beta.ci))  # Ignore limit labels
+as.numeric(rev(exp(-12*beta.ci)))  # Limit labels removed
+```
+The odds of success of 64-yards-kick is better by 3.976 than 76-yards-kick.

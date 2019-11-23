@@ -1,0 +1,37 @@
+---
+title: "Lecture8_2"
+author: "Jiansong Xu"
+date: "February 5, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 2
+
+(a)
+```{r}
+library(dplyr)
+placekick <- read.csv("U:/stat475/assignment2/Placekick.csv")
+placekick <- mutate(placekick, week = as.factor(week), change = as.factor(change), PAT = as.factor(PAT), type = as.factor(type), field = as.factor(field), wind = as.factor(wind))
+k.fit <- glm(good ~ ., family = binomial(link = logit), data = placekick)
+summary(k.fit)
+```
+
+(b)
+```{r}
+library(car)
+k.fit2 <- glm(good ~ distance, family = binomial(link = logit), data = placekick)
+anova(k.fit, k.fit2, test = "LR")
+```
+From the result, we can drop all of the rest variables.
+
+
+(c)
+```{r}
+Anova(k.fit)
+```
+Distance and PAT seem to contribute significantly to the model fit.
+i. We cannot conclude to use only the 2 variables, because in our model we haven't tested any interaction effects. 

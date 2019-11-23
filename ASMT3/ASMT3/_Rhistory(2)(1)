@@ -1,0 +1,131 @@
+knitr::opts_chunk$set(echo = TRUE)
+workers <- read.csv("healthcare_worker.csv")
+setwd("C:/Users/jxa36.ADSFU/Desktop/ASMT3")
+workers <- read.csv("healthcare_worker.csv")
+head(workers)
+workers %>% mutate(Absence = Size - Hepatitis)
+library(tidyverse)
+workers %>% mutate(Absence = Size - Hepatitis)
+workers %>% mutate(Absence = Size - Hepatitis) %>% gather(Counts, Size, Absence, Hepatitis,na.rm = FALSE)
+workers %>% mutate(Absence = Size - Hepatitis) %>% gather(Counts, Size, Absence, Hepatitis,na.rm = FALSE)
+workers %>% mutate(Absence = Size - Hepatitis) %>% gather(Counts, Size, Absence, Hepatitis,na.rm = TRUE)
+workers %>% mutate(Absence = Size - Hepatitis) %>% gather(key = Ocupp.group, Size, Absence, Hepatitis,na.rm = TRUE)
+workers %>% mutate(Absence = Size - Hepatitis) %>% gather(key = Ocupp.group, Hepatitis, Absence, Hepatitis,na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% gather(key = Ocupp.group, Counts ,na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis, Hepa = NULL) %>% gather(key = Hepa, Size, Presence, Absence, na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% gather(key = Hepa, Size, Presence, Absence, na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% gather(key = Hepa, Presence+Absence, Presence, Absence, na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% gather(key = Hepa, Presence, Absence, Presence, Absence, na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% gather(key = Hepa, c(Presence, Absence), Presence, Absence, na.rm = TRUE)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% gather(key = Hepa, c('Presence', 'Absence'), Presence, Absence, na.rm = TRUE)
+workers <- read.csv("healthcare_worker.csv")
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis) %>% gather(key = hepatitis, value = Presence + Absence, Presence, Absence)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis) %>% gather(key = hepatitis, value = Size, Presence, Absence)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis) %>% gather(key = hepatitis, value = Occup.group, Presence, Absence)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis)
+wrk.table <- xtabs(Size ~ Occup.group + Presence)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis) -> workers
+wrk.table <- xtabs(Size ~ Occup.group + Presence, data = workers)
+wrk.table
+table(works)
+table(workers)
+table(workers$Occup.group, workers$Presence)
+table(workers$Occup.group)
+workers
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) -> workers
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) -> workers
+workers <- read.csv("healthcare_worker.csv")
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) -> workers
+table(workers$Presence, workers$Absence)
+gather(workers, ket = status, value = Presence, Absence)
+gather(workers, key = status, value = Presence, Absence)
+gather(workers, key = status, value = Presence+Absence, Presence, Absence)
+gather(workers, key = status, value = Presence:Absence, Presence, Absence)
+gather(workers, key = status, value = Presence, Absence, Presence, Absence)
+gather(workers, key = status, value = Presence, Absence, Presence, Absence) -> workers
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(workers, key = status, value = Presence, Absence, Presence, Absence) -> workers
+workers <- read.csv("healthcare_worker.csv")
+workers$'Presence + Absence'
+workers$Presence + Absence
+workers
+workers <- read.csv("healthcare_worker.csv")
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(workers, key = status, value = Presence, Absence, Presence, Absence) -> workers
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Presence, Absence, Presence, Absence) -> workers
+workers
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Presence, Absence) -> workers
+workers <- read.csv("healthcare_worker.csv")
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Presence, Absence) -> workers
+workers
+workers <- read.csv("healthcare_worker.csv")
+)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Number, Absence, Presence) -> workers
+workers
+wrk.table <- xtabs(Number ~ Occup.groups + status, data = workers)
+wrk.table <- xtabs(Number ~ Occup.group + status, data = workers)
+wrk.table
+wrk.table <- addmargin(xtabs(Number ~ Occup.group + status, data = workers))
+wrk.table <- addmargins(xtabs(Number ~ Occup.group + status, data = workers))
+wrk.table
+workers <- read.csv("healthcare_worker.csv")
+head(workers)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Number, Absence, Presence) -> workers
+wrk.table <- addmargins(xtabs(Number ~ Occup.group + status, data = workers))
+wrk.table
+wrk.table <- xtabs(Number ~ Occup.group + status, data = workers)
+wrk.table
+install.packages("vcd")
+library(package = vcd)
+assocstats(x = wrk.table)
+workers <- read.csv("healthcare_worker.csv")
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Number, Absence, Presence) %>%
+xtabs(Number ~ Occup.group + status)
+workers <- read.csv("healthcare_worker.csv")
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Number, Absence, Presence) -> workers
+xtabs(Number ~ Occup.group + status, data = workers)
+xtabs(Number ~ Occup.group + status, data = workers) -> wrk.table
+wrk.table
+assocstats(x = wrk.table)
+prop.table(op.table, margin=1)
+prop.table(wrk.table, margin=1)
+ind.test <- chisq.test(x=WRK.table, correct=FALSE)
+ind.test <- chisq.test(x=wrk.table, correct=FALSE)
+ind.test
+round(ind.test$stdres, digits=1)
+prop.table(wrk.table, margin=1)
+round(ind.test$stdres, digits=1)
+workers
+wrk2 <- read.csv("healthcare_worker.csv")
+glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+lgfit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+chisq.test(lgfit)
+library(car)
+Anova(lgfit, test = "LR")
+anova(lgfit, test = "LR")
+Anova(lgfit, test = "LR")
+typeof(wrk2$Occup.group)
+typeof(wrk2$Occup.group)
+wrk2 <- mutate(wrk2, Occup.group = as.factor(Ocuup.group))
+wrk2 <- mutate(wrk2, Occup.group = as.factor(Occup.group))
+wrk2
+typeof(wrk2$Occup.group)
+typeof(wrk2$Occup.group)
+lgfit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+library(car)
+Anova(lgfit, test = "LR")
+anova(lgfit, test = "LR")
+lgfit
+anova(lgfit, test = "LR")

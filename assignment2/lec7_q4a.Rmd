@@ -1,0 +1,16 @@
+---
+title: "Lecture 7_4a"
+author: "Jiansong Xu"
+date: "February 4, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 4(a)
+If trails are not independent, the probability of success of one trail cannot be measured by the parameter itself, it has to be combined with another parameter from another trail. In practice, each trail may be be absolutely independent, this will cause big problem if population size is small. 
+
+
+

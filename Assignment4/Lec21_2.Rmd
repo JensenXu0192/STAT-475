@@ -1,0 +1,99 @@
+---
+title: "Lec21_2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2
+```{r}
+library(dplyr)
+library(mcprofile)
+```
+(a)
+```{r}
+bird <- read.csv("bird.csv")
+bird$Degradation <- factor(bird$Degradation, levels = levels(bird$Degradation[c(3, 1, 2)]))
+bfit <- glm(Count ~ ., family = poisson(link = "log"), data = bird)
+summary(bfit)$deviance # Residual devicance
+summary(bfit)$df[2] # Residual degrees of freedom 
+```
+
+(b)
+```{r}
+bfit2 <- glm(Count ~ .*., family = poisson(link = "log"), data = bird) # Saturated model
+anova(bfit, bfit2, test = "LR")
+```
+LR test: 
+
+
+H0: all parameters of interaction terms are 0,  Ha: at least one parameter of interaction terms are not 0
+
+
+P-value = 9.417e-12
+
+
+Reject H0 and conclude that 'Guild' and 'Degradation' are associated. 
+
+(c)
+```{r}
+# look at coefficients to see the position of each
+coef(bfit2)
+```
+```{r}
+# Baselines are 'Air-Arth' and 'High' for Guild and Degradation.
+# Work on log scale, we can find coefficients of each ratio via simple algebra
+# Make coefficient matrix regarding the position of each one in the model, each row represents one Guild category
+k <- matrix(data = c(0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), nrow = 7, byrow = TRUE)
+pro.est <- mcprofile(bfit2, k)
+table <- exp(confint(pro.est)) # Exponentiate to get counts
+
+# Organize mcprofile output to make it more informative
+table$estimate %>% unlist() -> i
+table$confint %>% unlist() -> ii
+op <- data.frame(High.vs.Low = i, lower = ii[1:7], upper = ii[8:14])
+op <- `row.names<-`(op, c("GuildFruit", "GuildGround-Arth", "GuildLeaf-Arth", "GuildNectar", "GuildSeeds", "GuildWood-Arth", "GuildAir-Arth"))
+op
+```
+
+i.
+
+The ratio under GuildWood-Arth is low. 
+
+
+ii.
+
+This ratio measures adverse effect because it measures the multiplicative change in mean when switching from low to high degradation. Accordingly, when this ratios is far smaller than 1 the reduction effect in mean counts is severe.
+
+
+(d)
+```{r}
+# Similar to the last part
+# By doing algebra on the log scale, ratio of mean ratios can be represented by coefficients
+# Make coefficient matrix
+krr <- matrix(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0), nrow = 6, byrow = TRUE)
+rr.est <- mcprofile(bfit2, krr)
+table.rr <- exp(confint(rr.est))
+
+table.rr$estimate %>% unlist() -> d
+table.rr$confint %>% unlist() -> dd
+op.rr <- data.frame(Ratio = d, lower = dd[1:6], upper = dd[7:12])
+op.rr <- `rownames<-`(op.rr, c("Wood vs Fruit", "Wood vs Ground", "Wood vs Leaf", "Wood vs Nectar", "Wood vs Seeds", "Wood vs Air"))
+op.rr
+```
+ii.
+
+All estimated odds ratios are smaller than 1, which says comparing to all others Wood-Arth guild group experiances higher abundance reduction in high vs low degradation. However Wood vs Air ratio has CI with upper limit bigger than 1, so in Wood guild the reduction effect can potentially be smaller than or same as in Air guild.

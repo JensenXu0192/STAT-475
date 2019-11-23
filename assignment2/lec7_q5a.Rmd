@@ -1,0 +1,75 @@
+---
+title: "Lecture 7_5a"
+author: "Jiansong Xu"
+date: "February 4, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 5(a)
+```{r}
+challenger <- read.csv('U:/stat475/assignment2/challenger.csv')
+mod.fit <- glm(formula=O.ring/Number ~ Temp, family=binomial(link = logit), weights = Number, data=challenger)
+mod.fit
+```
+(a) 
+logit(pi) = 5.0850 - 0.1156*Temp
+
+(b)
+```{r}
+library(dplyr)
+challenger <- mutate(challenger, proportion = O.ring/Number)
+plot(x=challenger$Temp, y=challenger$proportion,  
+     main="Proportions of made challengers with Wilcon CIs",
+     xlab="Temp", ylab="Proportion of successes")
+head(challenger)
+# At each Temp, compute score confidence interval for prob of success
+#  Do this by creating a function that computes the score interval on one row
+#  and apply the funciton to each row (MARGIN=1) of the challenger data frame.
+
+library(package = binom)
+wilson <- function(x){
+  binom.confint(x = x[4], n = x[5], conf.level = 0.95, methods = "wilson")
+}
+dist.ci <- apply(X=challenger, MARGIN=1, FUN=wilson)
+
+# Have to do some gymnastics to get out the endpoints.
+#  apply() created a list of results, so unlist them into matrix form
+#  and add them to our data frame
+dist.ci1 <- matrix(data=unlist(dist.ci), byrow = TRUE,  nrow = nrow(challenger)) 
+challenger <- data.frame(challenger, lower=dist.ci1[,5], upper=dist.ci1[,6])
+
+# Now add each line to the plot in the same way.  segments() can draw a line
+#   segment on an existing plot from (x0,y0) to (x1,y1).  
+#   Can omit one x or y if it remains constant, as here we want vertical lines.
+ci.lines <- function(x){segments(x0=x[2], y0=x[7], y1=x[8], col=grey(.7))}
+apply(X=challenger, MARGIN=1, FUN=ci.lines)
+
+# Add fitted logistic regression curve
+# curve() evaluates a function at various points of a generically named variable x.
+
+curve(expr = predict(object = mod.fit, newdata = data.frame(Temp = x), type = "response"), col = "red", add = TRUE,
+      xlim = c(0, 90))
+
+
+```
+
+(c)
+```{r}
+
+pred <- function(Temp) {
+  df <- data.frame(Temp = Temp)
+  log_odds <- predict(mod.fit, newdata = df)
+  exp(log_odds)/(exp(log_odds)+1)
+}
+data.frame(Temp=c(81, 61, 31), probability = c(pred(81), pred(61), pred(31)))
+```
+
+(d)
+```{r}
+range(challenger$Temp)
+```
+We can see in the dataset the smallest record of temperature is 53. So at Temp=31 there is no data to fit the curve. The prediction from our model at Temp=31 may be not reliable. But given the 99% probability I would not ride shit shuttle. 

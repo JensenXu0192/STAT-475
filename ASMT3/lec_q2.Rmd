@@ -1,0 +1,35 @@
+---
+title: "lec11_q2"
+author: "Jiansong Xu"
+date: "February 27, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##  Ex2
+(a)
+```{r}
+tomato <- read.csv("TomatoVirus.csv")
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+    weights = Plants)
+##Set baseline to N since we are comparing to no-control group. 
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+as.numeric(exp(mod.fit$coefficients[4]))
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+```
+
+(b)
+Do a significance test on the interaction term Infest:ControlC.
+H0: beta_6 = 0(interaction of Infest and ControlC has no effect in the model)
+Ha: beta_6 != 0
+```{r}
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+summary(mod.fit.inter)
+```
+We failed to reject H0, so we can conclude that changing infest type has no impact on the performance of chemical control method. 

@@ -1,0 +1,21 @@
+---
+title: "Lec18_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 2 (a)
+
+```{r}
+est.mu <- 225
+n <- 1
+alpha = 0.05
+## Exact CI
+qchisq(p = c(alpha/2, 1 - alpha/2), df = c(2*n*est.mu, 2*(n*est.mu + 1)))/(2*n)->CI
+round(CI,2)
+```
+We expect 95% of all similarly constructed intervals with range [196.56, 256.40] to contain the mean count of cars crossing this bridge at this time period.
+

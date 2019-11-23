@@ -1,0 +1,25 @@
+---
+title: "lec11_q19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##19
+
+Run a LR model comparasion test
+H0 : beta_1 = 0
+Ha: beta_1 != 0
+```{r}
+wrk <- read.csv('healthcare_worker.csv')
+library(dplyr)
+library(car)
+wrk.fit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk)
+Anova(wrk.fit, test = "LR")
+data.frame(ORs = exp(wrk.fit$coefficients[-1]), Contact = c("Fluid", "Lab", "Non - patient Contact", "Patient contact"))
+```
+
+The test statistic yields to do not reject H0, so we accept that occupational groups have no effect on hepatitis.
+From the ORs we see the odds of being hepatitis positive in the non-patient contact category is 2.82 times as high as the baseline level(exposure prone), which is the highest, and this is the opposite of my expectation..

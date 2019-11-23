@@ -1,0 +1,80 @@
+---
+title: "Lec13_1"
+author: "Jiansong Xu"
+date: "February 27, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1
+
+(a)
+```{r}
+shuttle <- read.csv("challenger.csv")
+probit.fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "probit"), weights = Number, data = shuttle)
+summary(probit.fit)
+```
+(b)
+```{r}
+log.fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "cloglog"), weights = Number, data = shuttle)
+summary(log.fit)
+```
+(c)
+```{r}
+fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "logit"), weights = Number, data = shuttle)
+curve(expr = predict(object = probit.fit, newdata = data.frame(Temp = x), type = "response"), col = "red", xlim = c(30, 90))
+curve(expr = predict(object = log.fit, newdata = data.frame(Temp = x), type = "response"), col = "blue", xlim = c(30, 90), add = TRUE)
+curve(expr = predict(object = fit, newdata = data.frame(Temp = x), type = "response"), col = "black", xlim = c(30, 90), add = TRUE)
+```
+
+(d)
+```{r}
+alpha = 0.05
+##Probit
+probit.pred <- predict(probit.fit, newdata = data.frame(Temp = 31), type = "response", se = TRUE)
+probit.pred$fit
+CI.pro.lower <- probit.pred$fit - qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro.upper <- probit.pred$fit + qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro <- cbind(CI.pro.lower, CI.pro.upper)
+CI.pro
+```
+The predicted failure rate when temp = 31 is 0.696.
+We expected 95% of all similarly constructed intervals that are [0.109, 1.284] to contain the probability of failure when Temp = 31.
+
+```{r}
+##cloglog
+log.pred <- predict(log.fit, data.frame(Temp = 31), type = "response", se = TRUE)
+ci.log.lower <- log.pred$fit - qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log.upper <- log.pred$fit + qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log <- cbind(ci.log.lower, ci.log.upper)
+log.pred$fit
+ci.log
+```
+The predicted failure rate when temp = 31 is 0.973.
+We expected 95% of all similarly constructed intervals that are [0.692, 1.254] to contain the probability of failure when Temp = 31.
+
+```{r}
+##Logistic
+pred <- predict(fit, data.frame(Temp = 31), type = "response", se = TRUE)
+lower<- pred$fit - qnorm(p=c(1-alpha/2))*pred$se
+upper <- pred$fit + qnorm(p=c(1-alpha/2))*pred$se
+ci <- cbind(lower, upper)
+pred$fit
+ci
+```
+The predicted failure rate when temp = 31 is 0.818.
+We expected 95% of all similarly constructed intervals that are [0.346, 1.289] to contain the probability of failure when Temp = 31.
+
+(e)
+```{r, messsage = FALSE}
+library(dplyr)
+rbind(CI.pro, ci.log, ci) %>% cbind(rbind(probit.pred$fit, log.pred$fit, pred$fit)) -> compare
+rownames(compare) <- c("probit", "cloglog", "logistic")
+colnames(compare)[3] <- "predict"
+compare
+```
+CIs are not similar, as the logistic model prediction has a wider CI, and probit gives a quite narrow CI.
+And predictied failure rates are not similar among methods. 

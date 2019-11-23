@@ -1,0 +1,70 @@
+---
+title: "Lecture9_5cd"
+author: "Jiansong Xu"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercise 5 
+
+(c)
+```{r}
+library(dplyr)
+challenger <- read.csv('U:/stat475/assignment2/challenger.csv')
+mod.fit <- glm(formula=O.ring/Number ~ Temp, family=binomial(link = logit), weights = Number, data=challenger)
+challenger <- mutate(challenger, proportion = O.ring/Number)
+plot(x=challenger$Temp, y=challenger$proportion,  
+     main="Proportions of made challengers with Wilcon CIs",
+     xlab="Temp", ylab="Proportion of successes")
+library(package = binom)
+wilson <- function(x){
+  binom.confint(x = x[4], n = x[5], conf.level = 0.95, methods = "wilson")
+}
+dist.ci <- apply(X=challenger, MARGIN=1, FUN=wilson)
+
+dist.ci1 <- matrix(data=unlist(dist.ci), byrow = TRUE,  nrow = nrow(challenger)) 
+challenger <- data.frame(challenger, lower=dist.ci1[,5], upper=dist.ci1[,6])
+
+ci.lines <- function(x){segments(x0=x[2], y0=x[7], y1=x[8], col=grey(.7))}
+apply(X=challenger, MARGIN=1, FUN=ci.lines)
+
+curve(expr = predict(object = mod.fit, newdata = data.frame(Temp = x), type = "response"), col = "red", add = TRUE,
+      xlim = c(0, 90))
+
+library(package = mcprofile)
+
+# Create the coefficient matrix for the parameters in the 
+#   linear predictor
+all.temp=data.frame(Temp=c(53:81))
+K <- as.matrix(cbind(1,all.temp))
+class(K)  # matrix
+
+# Use the mcprofile(object=, CM=, ...) function to find profile 
+#   likelihood values.
+# Can take a little time in complex models.
+profiles <- mcprofile(object=mod.fit, CM=K)  
+
+# There is a confint() method developed specifically for objects 
+#   produced by mcprofile().  "adjust=" allows you to use methods 
+#   to control simultaneous coverage probabilities, like Bonferroni 
+ci.logit.LR <- confint(object=profiles, level=0.95, adjust = "none")  
+# CI for beta_0 + beta_1 * x
+ci.pi.LR <- exp(ci.logit.LR$confint)/(1 + exp(ci.logit.LR$confint))
+# Show these as bands on our plot
+lines(x = all.temp[,1], y = ci.pi.LR[,1], col = "blue")
+lines(x = all.temp[,1], y = ci.pi.LR[,2], col = "blue")
+```
+
+(d)
+```{r}
+pred <- predict(mod.fit, data.frame(Temp = 31), "response", se.fit = TRUE)
+pred
+critval <- 1.96 ## approx 95% CI
+upr <- pred$fit + (critval * pred$se.fit)
+lwr <- pred$fit - (critval * pred$se.fit)
+data.frame(lower = lwr, upper = upr)
+```

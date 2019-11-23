@@ -1,0 +1,287 @@
+setwd("C:/Users/Jensen/Desktop/stat475/ASMT3")
+knitr::opts_chunk$set(echo = TRUE)
+read.csv('healthcare_worker.csv')
+library(car)
+read.csv('healthcare_worker.csv')
+wrk <- read.csv('healthcare_worker.csv')
+wrk.fit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk)
+Anova(wrk.fit, test = "LR")
+typeof(wrk$Occup.group)
+wrk
+typeof(wrk$Occup.group)
+library(dplyr)
+wrk %>% mutate(Occup.group = as.factor(Occup.group)) -> wrk
+wrk <- read.csv('healthcare_worker.csv')
+library(dplyr)
+library(car)
+wrk %>% mutate(Occup.group = as.factor(Occup.group)) -> wrk
+wrk.fit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk)
+Anova(wrk.fit, test = "LR")
+wrk <- read.csv('healthcare_worker.csv')
+wrk.fit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk)
+Anova(wrk.fit, test = "LR")
+summary(wrk.fit)
+data.frame(ORs = exp(wrk.fit$coefficients), Contact = c("Fluid", "Lab", "patient Contact", "NonPatient"))
+data.frame(ORs = exp(wrk.fit$coefficients[-1,]), Contact = c("Fluid", "Lab", "patient Contact", "NonPatient"))
+data.frame(ORs = exp(wrk.fit$coefficients[[-1]]), Contact = c("Fluid", "Lab", "patient Contact", "NonPatient"))
+data.frame(ORs = exp(wrk.fit$coefficients[-1]), Contact = c("Fluid", "Lab", "patient Contact", "NonPatient"))
+wrk <- read.csv('healthcare_worker.csv')
+library(dplyr)
+library(car)
+wrk.fit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk)
+Anova(wrk.fit, test = "LR")
+data.frame(ORs = exp(wrk.fit$coefficients[-1]), Contact = c("Fluid", "Lab", "patient Contact", "NonPatient"))
+data.frame(ORs = exp(wrk.fit$coefficients[-1]), Contact = c("Fluid", "Lab", "patient Contact", "NonPatient"))
+summary(wrk.fit)
+data.frame(ORs = exp(wrk.fit$coefficients[-1]), Contact = c("Fluid", "Lab", "Non - patient Contact", "Patient contact"))
+install.packages("vcd")
+knitr::opts_chunk$set(echo = TRUE)
+workers <- read.csv("healthcare_worker.csv")
+head(workers)
+levels(workers$Occup.group)
+library(tidyverse)
+workers %>% mutate(Presence = Hepatitis, Absence = Size - Hepatitis) %>% select(-Hepatitis, -Size) %>%
+gather(key = status, value = Number, Absence, Presence) -> workers
+xtabs(Number ~ Occup.group + status, data = workers) -> wrk.table
+wrk.table
+library(package = vcd)
+assocstats(x = wrk.table)
+ind.test <- chisq.test(x=wrk.table, correct=FALSE)
+ind.test
+prop.table(wrk.table, margin=1)
+round(ind.test$stdres, digits=1)
+wrk2 <- read.csv("healthcare_worker.csv")
+wrk2 <- mutate(wrk2, Occup.group = as.factor(Occup.group))
+lgfit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+library(car)
+anova(lgfit, test = "LR")
+```{r, message=FALSE}
+wrk2 <- read.csv("healthcare_worker.csv")
+wrk2 <- mutate(wrk2, Occup.group = as.factor(Occup.group))
+lgfit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+library(car)
+anova(lgfit, test = "LR")
+wrk2 <- read.csv("healthcare_worker.csv")
+wrk2 <- mutate(wrk2, Occup.group = as.factor(Occup.group))
+lgfit <- glm(Hepatitis/Size ~ Occup.group, weights = Size, family = binomial(link = "logit"), data = wrk2)
+library(car)
+anova(lgfit, test = "LR")
+knitr::opts_chunk$set(echo = TRUE)
+head(tomato)
+tomato <- read.csv("TomatoVirus.csv")
+head(tomato)
+knitr::opts_chunk$set(echo = TRUE)
+tomato <- read.csv("TomatoVirus.csv")
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+##Set baseline to N since we are comparing to no-control group.
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+exp(mod.fit$coefficients[3])
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+anova(mod.fit.inter, test = "LR")
+summary(mod.fit.inter)
+tomato <- transform(tomato, Infest = as.factor(Infest))
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+knitr::opts_chunk$set(echo = TRUE)
+tomato <- read.csv("TomatoVirus.csv")
+tomato <- transform(tomato, Infest = as.factor(Infest))
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+##Set baseline to N since we are comparing to no-control group.
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+exp(mod.fit$coefficients[3])
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+anova(mod.fit.inter, test = "LR")
+summary(mod.fit.inter)
+knitr::opts_chunk$set(echo = TRUE)
+tomato <- read.csv("TomatoVirus.csv")
+tomato <- transform(tomato, Infest = as.factor(Infest))
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+##Set baseline to N since we are comparing to no-control group.
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+exp(mod.fit$coefficients[3])
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+anova(mod.fit.inter, test = "LR")
+summary(mod.fit.inter)
+knitr::opts_chunk$set(echo = TRUE)
+tomato <- read.csv("TomatoVirus.csv")
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+##Set baseline to N since we are comparing to no-control group.
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+exp(mod.fit$coefficients[3])
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+anova(mod.fit.inter, test = "LR")
+summary(mod.fit.inter)
+typeof(tomato$Infest)
+knitr::opts_chunk$set(echo = TRUE)
+tomato <- read.csv("TomatoVirus.csv")
+tomato <- transform(tomato, Infest = as.factor(Infest))
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+##Set baseline to N since we are comparing to no-control group.
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+exp(mod.fit$coefficients[3])
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+anova(mod.fit.inter, test = "LR")
+summary(mod.fit.inter)
+typeof(tomato$Infest)
+Anova(mod.fit.inter, test = "LR")
+summary(mod.fit.inter)
+summary(mod.fit.inter)[Infest2:ControlC]
+summary(mod.fit.inter)[Infest2:ControlC,]
+summary(mod.fit.inter)
+knitr::opts_chunk$set(echo = TRUE)
+tomato <- read.csv("TomatoVirus.csv")
+tomato <- transform(tomato, Infest = as.factor(Infest))
+mod.fit<-glm(formula = Virus8/Plants ~ Infest + Control, family = binomial(link = logit), data = tomato,
+weights = Plants)
+##Set baseline to N since we are comparing to no-control group.
+tomato$Control <- relevel(tomato$Control, ref = "N")
+#exponentiate coefficient of controlC to get the OR of controlC to controlN
+exp(mod.fit$coefficients[3])
+# Profile likelihood ratio interval
+exp(confint(object = mod.fit, parm = "ControlC", level = 0.95))
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+summary(mod.fit.inter)
+mod.fit.inter$coefficients
+library(car)
+mod.fit.inter <- glm(formula=Virus8/Plants ~ Infest + Control + Infest:Control, family=binomial(link=logit), data=tomato, weights=Plants)
+summary(mod.fit.inter)
+setwd("C:/Users/Jensen/Desktop/stat475/ASMT3")
+knitr::opts_chunk$set(echo = TRUE)
+shuttle <- read.csv("challenger.csv")
+head(shuttle)
+probit.fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "probit"), weights = Number, data = shuttle)
+summary(probit.fit)
+log.fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "cloglog"), weights = Number, data = shuttle)
+summary(log.fit)
+fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "logit"), weights = Number, data = shuttle)
+curve(expr = predict(object = probit.fit, newdata = data.frame(Temp = x), type = "response"), col = "red", xlim = c(30, 90))
+curve(expr = predict(object = log.fit, newdata = data.frame(Temp = x), type = "response"), col = "blue", xlim = c(30, 90), add = TRUE)
+curve(expr = predict(object = fit, newdata = data.frame(Temp = x), type = "response"), col = "black", xlim = c(30, 90), add = TRUE)
+alpha = 0.05
+##Probit
+probit.pred <- predict(probit.fit, newdata = data.frame(Temp = 31), type = "response", se = TRUE)
+probit.pred
+CI.pro.lower <- probit.pred$fit - qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro.upper <- probit.pred$fit + qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro <- cbind(CI.pro.lower, CI.pro.upper)
+CI.pro
+##cloglog
+log.pred <- predict(log.fit, data.frame(Temp = 31), type = "response", se = TRUE)
+ci.log.lower <- log.pred$fit - qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log.upper <- log.pred$fit + qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log <- cbind(ci.log.lower, ci.log.upper)
+log.pred
+ci.log
+##Logistic
+pred <- predict(fit, data.frame(Temp = 31), type = "response", se = TRUE)
+lower<- pred$fit - qnorm(p=c(1-alpha/2))*pred$se
+upper <- pred$fit + qnorm(p=c(1-alpha/2))*pred$se
+ci <- cbind(lower, upper)
+pred
+ci
+library(dplyr)
+rbind(CI.pro, ci.log, ci) %>% cbind(rbind(probit.pred, log.pred, pred)) -> compare
+rownames(compare) <- c("probit", "cloglog", "logistic")
+compare
+probit.pred$fit
+alpha = 0.05
+##Probit
+probit.pred <- predict(probit.fit, newdata = data.frame(Temp = 31), type = "response", se = TRUE)
+probit.pred$fit
+CI.pro.lower <- probit.pred$fit - qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro.upper <- probit.pred$fit + qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro <- cbind(CI.pro.lower, CI.pro.upper)
+CI.pro
+##cloglog
+log.pred <- predict(log.fit, data.frame(Temp = 31), type = "response", se = TRUE)
+ci.log.lower <- log.pred$fit - qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log.upper <- log.pred$fit + qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log <- cbind(ci.log.lower, ci.log.upper)
+log.pred$fit
+ci.log
+##Logistic
+pred <- predict(fit, data.frame(Temp = 31), type = "response", se = TRUE)
+lower<- pred$fit - qnorm(p=c(1-alpha/2))*pred$se
+upper <- pred$fit + qnorm(p=c(1-alpha/2))*pred$se
+ci <- cbind(lower, upper)
+pred$fit
+ci
+library(dplyr)
+rbind(CI.pro, ci.log, ci) %>% cbind(rbind(probit.pred, log.pred, pred)) -> compare
+rownames(compare) <- c("probit", "cloglog", "logistic")
+compare
+knitr::opts_chunk$set(echo = TRUE)
+shuttle <- read.csv("challenger.csv")
+probit.fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "probit"), weights = Number, data = shuttle)
+summary(probit.fit)
+log.fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "cloglog"), weights = Number, data = shuttle)
+summary(log.fit)
+fit <- glm(O.ring/Number ~ Temp, family = binomial(link = "logit"), weights = Number, data = shuttle)
+curve(expr = predict(object = probit.fit, newdata = data.frame(Temp = x), type = "response"), col = "red", xlim = c(30, 90))
+curve(expr = predict(object = log.fit, newdata = data.frame(Temp = x), type = "response"), col = "blue", xlim = c(30, 90), add = TRUE)
+curve(expr = predict(object = fit, newdata = data.frame(Temp = x), type = "response"), col = "black", xlim = c(30, 90), add = TRUE)
+alpha = 0.05
+##Probit
+probit.pred <- predict(probit.fit, newdata = data.frame(Temp = 31), type = "response", se = TRUE)
+probit.pred$fit
+CI.pro.lower <- probit.pred$fit - qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro.upper <- probit.pred$fit + qnorm(p=c(1 - alpha/2))*probit.pred$se
+CI.pro <- cbind(CI.pro.lower, CI.pro.upper)
+CI.pro
+##cloglog
+log.pred <- predict(log.fit, data.frame(Temp = 31), type = "response", se = TRUE)
+ci.log.lower <- log.pred$fit - qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log.upper <- log.pred$fit + qnorm(p=c(1-alpha/2))*log.pred$se
+ci.log <- cbind(ci.log.lower, ci.log.upper)
+log.pred$fit
+ci.log
+##Logistic
+pred <- predict(fit, data.frame(Temp = 31), type = "response", se = TRUE)
+lower<- pred$fit - qnorm(p=c(1-alpha/2))*pred$se
+upper <- pred$fit + qnorm(p=c(1-alpha/2))*pred$se
+ci <- cbind(lower, upper)
+pred$fit
+ci
+library(dplyr)
+rbind(CI.pro, ci.log, ci) %>% cbind(rbind(probit.pred, log.pred, pred)) -> compare
+rownames(compare) <- c("probit", "cloglog", "logistic")
+compare
+library(dplyr)
+rbind(CI.pro, ci.log, ci) %>% cbind(rbind(probit.pred$fit, log.pred$fit, pred$fit)) -> compare
+rownames(compare) <- c("probit", "cloglog", "logistic")
+compare
+colnames(compare[, 3]) <- "predict"
+colnames(compare[, 3]) <- c("predict")
+colnames(compare[3]) <- "predict"
+colnames(compare)[3] <- "predict"
+library(dplyr)
+rbind(CI.pro, ci.log, ci) %>% cbind(rbind(probit.pred$fit, log.pred$fit, pred$fit)) -> compare
+rownames(compare) <- c("probit", "cloglog", "logistic")
+colnames(compare)[3] <- "predict"
+compare

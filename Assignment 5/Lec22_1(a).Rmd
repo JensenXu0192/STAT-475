@@ -1,0 +1,17 @@
+---
+title: "Lec22_1(a)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1
+
+(a)
+
+GI VC:M | F:M denotes the ratio of mean ratios between "very conservative" and "moderate" ideology comparing "female" to "male". 
+
+GI M:VL | F:M measures the ratio of mean ratios between "moderate" and "very liberal" ideology comparing "female" to "male".  
+

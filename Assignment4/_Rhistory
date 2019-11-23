@@ -1,0 +1,139 @@
+knitr::opts_chunk$set(echo = TRUE)
+install.packages(c("knitr", "tidyverse", "mcprofile"))
+knitr::opts_chunk$set(echo = TRUE)
+burn <- data.frame(year = c(12, 12, 32, 20, 20, 27, 23, 19, 23, 26, 21, 3, 8, 35, 2, 19, 8, 25, 33, 35),
+Salamanders = c(3, 4, 8, 6, 10, 5, 4, 7, 2, 8, 6, 0, 2, 6, 1, 5, 1, 5, 4, 10))
+fit <- glm(Salamanders ~ year, family = poisson(link = "log"), data=burn)
+summary(fit)
+plot(x = burn$year, y = burn$Salamanders, xlab = "years after burn", ylab = "Saladander population")
+curve(expr = exp(fit$coefficients[1] + x*fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+##Find the percentage change in Salamander population when year +1
+round(100*(exp(fit$coefficients[2]) - 1), 2)
+plot(x = burn$year, y = burn$Salamanders, xlab = "years after burn", ylab = "Saladander population")
+curve(expr = exp(fit$coefficients[1] + x*fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+plot(x = burn$year, y = burn$Salamanders, xlab = "years after burn", ylab = "Saladander population")
+curve(expr = exp(fit$coefficients[1] + x*fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+#Graph
+plot(x = burn$year, y = burn$Salamanders, xlab = "years after burn", ylab = "Saladander population")
+curve(expr = exp(fit$coefficients[1] + x*fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+knitr::opts_chunk$set(echo = TRUE)
+#Model
+burn <- data.frame(year = c(12, 12, 32, 20, 20, 27, 23, 19, 23, 26, 21, 3, 8, 35, 2, 19, 8, 25, 33, 35),
+Salamanders = c(3, 4, 8, 6, 10, 5, 4, 7, 2, 8, 6, 0, 2, 6, 1, 5, 1, 5, 4, 10))
+fit <- glm(Salamanders ~ year, family = poisson(link = "log"), data=burn)
+summary(fit)
+#Graph
+plot(x = burn$year, y = burn$Salamanders, xlab = "years after burn", ylab = "Saladander population")
+curve(expr = exp(fit$coefficients[1] + x*fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+##Find the percentage change in Salamander population when year +1
+round(100*(exp(fit$coefficients[2]) - 1), 2)
+knitr::opts_chunk$set(echo = TRUE)
+(est.mu + qnorm(p = 1 - alpha/2)^2/(2*n)) + qnorm(p = c(alpha/2, 1 - alpha/2)) * sqrt((est.mu + qnorm(p = 1 - alpha/2)^2/(4*n))/n)
+est.mu <- 225
+n <- 1
+alpha = 0.05
+## Exact CI
+qchisq(p = c(alpha/2, 1 - alpha/2), df = c(2*n*est.mu, 2*(n*est.mu + 1)))/(2*n)->CI
+round(CI,2)
+(est.mu + qnorm(p = 1 - alpha/2)^2/(2*n)) + qnorm(p = c(alpha/2, 1 - alpha/2)) * sqrt((est.mu + qnorm(p = 1 - alpha/2)^2/(4*n))/n)
+knitr::opts_chunk$set(echo = TRUE)
+(mu <- mean(storm$tornadoes))
+knitr::opts_chunk$set(echo = TRUE)
+storm <- read.csv("Stormchaser.csv")
+head(storm)
+(mu <- mean(storm$tornadoes))
+lower <- max(0,round(x = mu - 4*sqrt(mu) + 0.5, digits = 0))
+upper <- round(x = mu + 4*sqrt(mu) + 0.5, digits = 0)
+save.po1 <- data.frame(y = c(lower:upper),
+prob = round(x = dpois(x = c(lower:upper), lambda = mu),
+digits = 4))
+plot(x = save.po1$y, y = save.po1$prob, type = "h", lwd=1.5,
+xlab = "y", ylab = "P(Y=y)", main=paste("mu = ",round(mu, 3)))
+curve(expr = ((2*pi*mu)^(-1/2)) * exp(-(x-mu)^2/(2*mu)),
+from = lower, to = upper, add = TRUE, col="red", lwd=2)
+abline(h = 0, col = "blue")
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(mcprofile)
+bird <- read.csv("bird.csv")
+bird$Degradation <- factor(bird$Degradation, levels = levels(bird$Degradation[c(3, 1, 2)])) # Reorder to make variable  more informative
+bfit <- glm(Count ~ ., family = poisson(link = "log"), data = bird)
+summary(bfit)$deviance # Residual devicance
+summary(bfit)$df[2] # Residual degrees of freedom
+levels(bird$Guild)
+bfit2 <- glm(Count ~ .*., family = poisson(link = "log"), data = bird) # Saturated model
+anova(bfit, bfit2, test = "LR")
+# look at coefficients to see the position of each
+coef(bfit2)
+# Baselines are 'Air-Arth' and 'High' for Guild and Degradation.
+# Work on log scale, we can find coefficients of each ratio via simple algebra
+# Make coefficient matrix regarding the position of each one in the model, each row represents one Guild category
+k <- matrix(data = c(0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), nrow = 7, byrow = TRUE)
+pro.est <- mcprofile(bfit2, k)
+table <- exp(confint(pro.est)) # Exponentiate to get counts
+# Organize mcprofile output to make it more informative
+table$estimate %>% unlist() -> i
+table$confint %>% unlist() -> ii
+op <- data.frame(High.vs.Low = i, lower = ii[1:7], upper = ii[8:14])
+op <- `row.names<-`(op, c("GuildFruit", "GuildGround-Arth", "GuildLeaf-Arth", "GuildNectar", "GuildSeeds", "GuildWood-Arth", "GuildAir-Arth"))
+op
+# Similar to the last part
+# By doing algebra on the log scale, ratio of mean ratios can be represented by coefficients
+# Make coefficient matrix
+krr <- matrix(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0), nrow = 6, byrow = TRUE)
+rr.est <- mcprofile(bfit2, krr)
+table.rr <- exp(confint(rr.est))
+table.rr$estimate %>% unlist() -> d
+table.rr$confint %>% unlist() -> dd
+op.rr <- data.frame(Ratio = d, lower = dd[1:6], upper = dd[7:12])
+op.rr <- `rownames<-`(op.rr, c("Fruit vs Wood", "Ground vs Wood", "Leaf vs Wood", "Nectar vs Wood", "Seeds vs Wood", "Air vs Wood"))
+op.rr
+# Similar to the last part
+# By doing algebra on the log scale, ratio of mean ratios can be represented by coefficients
+# Make coefficient matrix
+coef(bfit2)
+# Similar to the last part
+# By doing algebra on the log scale, ratio of mean ratios can be represented by coefficients
+# Make coefficient matrix
+coef(bfit2)
+krr <- matrix(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0), nrow = 6, byrow = TRUE)
+rr.est <- mcprofile(bfit2, krr)
+table.rr <- exp(confint(rr.est))
+table.rr$estimate %>% unlist() -> d
+table.rr$confint %>% unlist() -> dd
+op.rr <- data.frame(Ratio = d, lower = dd[1:6], upper = dd[7:12])
+op.rr <- `rownames<-`(op.rr, c("Wood vs Fruit", "Wood vs Ground", "Wood vs Leaf", "Wood vs Nectar", "Wood vs Seeds", "Wood vs Air"))
+op.rr
+# Similar to the last part
+# By doing algebra on the log scale, ratio of mean ratios can be represented by coefficients
+# Make coefficient matrix
+krr <- matrix(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0), nrow = 6, byrow = TRUE)
+rr.est <- mcprofile(bfit2, krr)
+table.rr <- exp(confint(rr.est))
+table.rr$estimate %>% unlist() -> d
+table.rr$confint %>% unlist() -> dd
+op.rr <- data.frame(Ratio = d, lower = dd[1:6], upper = dd[7:12])
+op.rr <- `rownames<-`(op.rr, c("Wood vs Fruit", "Wood vs Ground", "Wood vs Leaf", "Wood vs Nectar", "Wood vs Seeds", "Wood vs Air"))
+op.rr
+setwd("C:/Users/jxa36.ADSFU/Desktop/Assignment4")

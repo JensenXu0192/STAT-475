@@ -1,0 +1,70 @@
+---
+title: "Lec19_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r, message=FALSE}
+aba <- read.csv("Abalone.csv")
+head(aba)
+library(dplyr)
+library(mcprofile)
+```
+
+(a)
+```{r}
+x <- c(0.1, 0.2, 0.3, 0.4)
+shell.fit <- glm(Rings ~ log(Shell), family = poisson(link = "log"), data = aba)
+K.means <- cbind(1,log(x))
+meanpro <- mcprofile(shell.fit, CM=K.means)
+CI.est <- exp(confint(meanpro))
+CI.est$estimate %>% unlist() -> s
+CI.est$confint %>% unlist() -> ss
+Means <- data.frame(Rings = s, lower = ss[1:4], ipper = ss[5:8])
+Means <- `rownames<-`(Means, c("Weight 0.1", "Weight 0.2", "Weight 0.3", "Weight 0.4"))
+K.means
+Means
+```
+```{r}
+plot(x = aba$Shell, y = aba$Rings, xlab = "shell weight", ylab = "number of rings", main = "Abalone poisson predictor with log shell")
+curve(expr = exp(shell.fit$coefficients[1] + log(x)*shell.fit$coefficients[2]), lwd = 2, add = TRUE, col = "red")
+```
+
+Comparing to figure 5, 2 graphs are indentical.
+
+
+(b)
+```{r}
+##log mean difference of a c-unit change is 
+##beta_1*(log(x+c)-log(x))
+x1 <- c(0.1, 0.2, 0.3)
+c <- 0.1
+change <- (log(x1+c)-log(x1))
+K.ratio <- cbind(0, change)
+mean.ratio <- mcprofile(shell.fit, CM = K.ratio)
+CI.change <- exp(confint(mean.ratio))
+
+##convert to percentage change
+d <- unlist(CI.change$estimate) ##work on vectors so math manipulations are valid
+f <- unlist(CI.change$confint)
+100*(d-1) -> i ##Estiamte in percentage
+100*(f-1) -> ii  ##CIs in percentage
+percent.change <- data.frame(estimate = i, lower = c(ii[1:3]), upper = c(ii[4:6]))
+percent.change <- `row.names<-`(percent.change, c("change from 0.1 to 0.2", "change from 0.2 to 0.3", "change from 0.3 to 0.4"))
+K.ratio
+percent.change
+```
+
+```{r}
+##check against part a
+ests <- unlist(CI.est$estimate)
+##convert to percentage change
+m <- data.frame(manual = c((ests[2]-ests[1])/ests[1], (ests[3]-ests[2])/ests[2], (ests[4]-ests[3])/ests[3]))
+cbind(m, percent.change)
+```
+From the comparison we can see percentage changes from mcprofile and rate of changes from manual calculation are identical.

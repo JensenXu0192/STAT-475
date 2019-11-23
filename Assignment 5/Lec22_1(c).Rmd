@@ -1,0 +1,23 @@
+---
+title: "Lec22_1(c)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## (c)
+```{r}
+# See the ording of parameters
+poli <- read.csv("PolIdeolData.csv")
+fit <- glm(count ~ gender*ideol, family = poisson(link = "log"), data = poli)
+coef(fit)
+```
+```{r}
+# Coefficient matrix
+K <- matrix(c(rep(0, 6), 0, 0, 1, 0,
+              rep(0, 6), 0, 0, 0, 1), nrow = 2, byrow = TRUE)
+row.names(K) <- c("GI VC:M | F:M", "GI M:VL | F:M")
+print(K)
+```

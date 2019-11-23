@@ -1,0 +1,44 @@
+---
+title: "Lecture 7_3"
+author: "Jiansong Xu"
+date: "February 4, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exrcise 3
+```{r}
+ # pdf(file = "c:\\figures\\Figure2.1BW.pdf", width = 7, height = 6, colormodel = "cmyk")   # Create plot for book
+  par(mfrow = c(1,2))
+  # par(pty="s") #Create square plots
+
+  beta0<-1
+  beta1<- -0.5
+  curve(expr = exp(beta0+beta1*x)/(1+exp(beta0+beta1*x)), xlim = c(-15, 15), col = "black",
+      main = expression(pi == frac(e^{1+0.5*x[1]}, 1+e^{1+0.5*x[1]})), xlab =  expression(x[1]),
+      ylab = expression(pi))
+```
+```{r}
+#Make beta1 greater but still smaller than 0
+beta0<-1
+  beta1<- -0.2
+  curve(expr = exp(beta0+beta1*x)/(1+exp(beta0+beta1*x)), xlim = c(-15, 15), col = "black",
+      main = expression(pi == frac(e^{1+0.5*x[1]}, 1+e^{1+0.5*x[1]})), xlab =  expression(x[1]),
+      ylab = expression(pi))
+```
+```{r}
+#Make beta1 smaller
+beta0<-1
+beta1<- -0.8
+  curve(expr = exp(beta0+beta1*x)/(1+exp(beta0+beta1*x)), xlim = c(-15, 15), col = "black",
+      main = expression(pi == frac(e^{1+0.5*x[1]}, 1+e^{1+0.5*x[1]})), xlab =  expression(x[1]),
+      ylab = expression(pi))
+```
+
+When beta1 is larger, the curve appears to be stretched to a flatter shape. 
+When beta1 is smaller, the curve stays closer to pi = 1 and 0.
+
+

@@ -1,0 +1,45 @@
+---
+title: "Lecture9_part3a"
+author: "Jiansong Xu"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 3
+
+(a)
+```{r}
+BW <- read.csv(file="C:/Users/jenx0/Desktop/stat475/assignment2/placekick.BW.csv", header=TRUE)
+library(dplyr)
+BW <- mutate(BW, GameNum = as.factor(GameNum))
+cfit <- glm(Good ~ ., family = binomial(link = "logit"), data = BW)
+BW %>% filter(Grass == 1, Weather != "Inside") -> Nick
+BW %>% filter(Grass == 0, Weather == "Inside") -> Steve
+
+Nick.pred <- predict(cfit, Nick)
+Steve.pred <- predict(cfit, Steve)
+N <- exp(mean(Nick.pred))/(1+exp(mean(Nick.pred))) ##Nick's mean probability of success
+S <- exp(mean(Steve.pred))/(1+exp(mean(Steve.pred))) ##Steve's mean probability of success
+data.frame(N, S)
+
+```
+
+Based on predictions, the difference between 2 probabilities of success is small. We may not support Nick's claim.
+
+
+Score test
+H0: Pi_v - Pi_p = 0
+Ha: Pi_v - Pi_p != 0
+```{r}
+w.v <- nrow(Nick %>% filter(Good == "Y"))
+n.v <- nrow(Nick)
+w.p <- nrow(Steve %>% filter(Good == "Y"))
+n.p <- nrow(Steve)
+prop.test(x=c(w.v, w.p), n=c(n.v, n.p), alternative="less", correct=FALSE)
+```
+
+Based on test statistic, we reject H0, so we cannot conclude the success rate of 2 groups are equal, therefore Nick's claim can be supported.

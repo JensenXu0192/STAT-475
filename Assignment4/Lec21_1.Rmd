@@ -1,0 +1,19 @@
+---
+title: "Lec 21_1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1
+
+Becasue in the full model with all indicators, each indicator representing a level in a categorical variable is in fact a binary variable, which means it has value either 0 or 1. Therefore, regardless of the value of indicator, each model term can be written as only a parameter. That is: when the indicator is 0 the whole term is automaticlly 0; when indicator is 1, the parameter stays in the model. 
+
+
+Furthermore, an observation belongs to only one level of each categorical variable, so in the model we should expect to see only one main effect indicator from each category is non-zero. And hence only the interactions between non-zero indicators stay, which can also be written as parameters themselves since interaction indicators are also either 0 or 1. 
+
+
+Moreover, the baseline levels of each categorical variable has been added to the intercept, so in this case we only have the second level indicator of each variable left.  
+
